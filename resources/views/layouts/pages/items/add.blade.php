@@ -31,7 +31,7 @@
 
         <div class="form-group mt-2">
             <label for="quantity">Quantity</label>
-            <input type="number" class="form-control" id="quantity" name="quantity" placeholder="Enter quantity" required>
+            <input type="number" class="form-control" id="quantity" name="quantity" placeholder="Enter quantity" required min="1">
         </div>
 
         <div class="form-group mt-2">

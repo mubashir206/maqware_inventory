@@ -9,12 +9,12 @@ class Restaurant extends Model
 {
     use HasFactory;
     
-    // protected $fillable = [
-    //     'name',
-    //     'email',
-    //     'phone',
-    //     'address'
-    // ];
+    protected $fillable = [
+        'name',
+        'email',
+        'phone',
+        'address'
+    ];
 
     public function restaurant_user()
     {

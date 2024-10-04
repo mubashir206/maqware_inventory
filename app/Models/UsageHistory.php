@@ -5,20 +5,27 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class RestaurantUser extends Model
+class UsageHistory extends Model
 {
     use HasFactory;
-
+    protected $table = 'usage_history';
+    
     protected $fillable = [
-        'restaurant_id',
         'user_id',
-        'is_manager'
+        'item_id',
+        'restaurant_id',
+        'quantity_used',
+        'stock_before',
+        'stock_after',
     ];
-
-
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function item()
+    {
+        return $this->belongsTo(Item::class);
     }
 
     public function restaurant()

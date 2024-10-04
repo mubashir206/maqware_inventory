@@ -38,8 +38,7 @@ class CheckRestaurantsForZeroItems extends Command
                 ->sum('quantity') ?? 0;
             
             $intTotalQuantity = intval($totalQuantity);
-        
-            if ($intTotalQuantity === 0) {
+            if ($intTotalQuantity == 0) {
                 Mail::to($restaurant->email)->send(new ZeroItems($restaurant));
                 $this->info('Email sent to: ' . $restaurant->email);
             } else {

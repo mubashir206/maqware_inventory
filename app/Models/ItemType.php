@@ -8,8 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class ItemType extends Model
 {
     use HasFactory;
-    // protected $table = 'item_types';
-    // protected $fillable = ['name'];
+    protected $fillable = ['name'];
     
     public function item()
     {

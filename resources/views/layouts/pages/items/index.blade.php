@@ -35,7 +35,7 @@
 
               </p>
               <a href="{{ route('item.edit', $item->id) }}" title="Edit" class="btn btn-sm btn-secondary">Edit</a>
-
+              <a href="{{ route('item.delete', $item->id) }}" title="Delete" onclick="return confirm('Are you sure want to delete this information !')" class="btn btn-sm btn-danger">Delete</a>
             </div>
           </div>
         </div> 
