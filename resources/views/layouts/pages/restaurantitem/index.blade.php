@@ -15,7 +15,7 @@
                 </div>
             @endif
         </div>
-        <a href="{{ route('restaurant.item.addPage', $id) }}" class="btn btn-primary">Add Restaurant item</a>
+        {{-- <a href="{{ route('restaurant.item.addPage', $id) }}" class="btn btn-primary">Add Restaurant item</a> --}}
 
     </div>
     <div class="row">
@@ -25,17 +25,18 @@
                     <tr>
                         <th>#</th>
                         <th>Items</th>
-                        <th>Action</th> 
+                        <th>Quantity</th> 
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($items as $key => $restitem)
                     <tr>
                         <td>{{ $key + 1 }}</td>
-                        <td>{{ $restitem->item->name }}</td>
-                        <td>
+                        <td>{{ $restitem->name }}</td>
+                        <td>{{ $restitem->quantity }}</td>
+                        {{-- <td>
                             <a href="{{ route('restaurant.item.delete', $restitem->id ) }}" onclick="return confirm('Are you want to delete this information')" title="Delete" class="btn btn-sm btn-danger">Delete</a>
-                        </td>
+                        </td> --}}
                     </tr>
                     
                     @endforeach

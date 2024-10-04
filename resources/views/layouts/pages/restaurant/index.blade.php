@@ -16,7 +16,6 @@
             @endif
         </div>
         <a href="{{ route('restaurant.add') }}" class="btn btn-primary">Add Restaurant</a>
-        {{-- <a href="{{ url('/restaurnat/user/add') }}" class="btn btn-primary">aurant User</a> --}}
 
     </div>
     <table class="table table-bordered table-hover">
@@ -49,6 +48,9 @@
             @endforeach
             
         </tbody>
+        <div class="pagination">
+            {{ $restaurants->links() }}
+        </div>
     </table>
 </div>
 @endsection

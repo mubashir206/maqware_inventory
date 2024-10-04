@@ -11,7 +11,7 @@ use function Laravel\Prompts\alert;
 class RestaurantController extends Controller
 {
     function index(){
-        $restaurants= Restaurant::all();
+        $restaurants= Restaurant::paginate(10);
         $data = compact('restaurants');
         return view('layouts.pages.restaurant.index')->with($data);
     }
