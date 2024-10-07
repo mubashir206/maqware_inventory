@@ -25,11 +25,11 @@ class ItemController extends Controller
         }
     
         if ($restaurantFilter) {
-            $items->where('restaurant_id', $restaurantFilter);  // Filter by selected restaurant
+            $items->where('restaurant_id', $restaurantFilter);  
         }
     
         $items = $items->latest()->paginate(6);
-        $restaurants = Restaurant::all();  // Get all restaurants for the dropdown
+        $restaurants = Restaurant::all(); 
     
         if ($request->ajax()) {
             return response()->json([
@@ -202,18 +202,18 @@ class ItemController extends Controller
     public function history(Request $request)
     {
         $query = $request->input('query');
-        $restaurantFilter = $request->input('restaurant'); // Get the selected restaurant
+        $restaurantFilter = $request->input('restaurant'); 
     
-        $restaurants = Restaurant::all(); // Fetch all restaurants for the dropdown
+        $restaurants = Restaurant::all(); 
     
         $itemshistory = ItemHistory::with(['restaurant', 'itemType', 'user'])
             ->when($restaurantFilter, function($q) use ($restaurantFilter) {
                 $q->whereHas('restaurant', function($q) use ($restaurantFilter) {
-                    $q->where('id', $restaurantFilter); // Filter by selected restaurant
+                    $q->where('id', $restaurantFilter); 
                 });
             })
             ->when($query, function($q) use ($query) {
-                $q->where('name', 'LIKE', "%{$query}%"); // Search by item name
+                $q->where('name', 'LIKE', "%{$query}%"); 
             })
             ->latest()
             ->paginate(5);

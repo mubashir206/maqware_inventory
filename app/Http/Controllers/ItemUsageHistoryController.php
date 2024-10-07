@@ -17,12 +17,12 @@ class ItemUsageHistoryController extends Controller
         $query = $request->input('query');  
         $restaurantFilter = $request->input('restaurant'); 
     
-        $restaurants = Restaurant::all();  // Get all restaurants
+        $restaurants = Restaurant::all();  
     
         $itemUsageHistorys = ItemUsageHistory::with(['buyerUser', 'restaurant', 'item', 'sellerUser'])
             ->when($restaurantFilter, function($q) use ($restaurantFilter) {
                 $q->whereHas('restaurant', function($q) use ($restaurantFilter) {
-                    $q->where('id', $restaurantFilter);  // Filter by selected restaurant
+                    $q->where('id', $restaurantFilter);  
                 });
             })
             ->where(function($q) use ($query) {
