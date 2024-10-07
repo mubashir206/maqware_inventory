@@ -5,21 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class UsageHistory extends Model
+class ItemUsageHistory extends Model
 {
     use HasFactory;
-    protected $table = 'usage_history';
-    
+
     protected $fillable = [
-        'user_id',
+        'seller_user_id', 
         'item_id',
         'restaurant_id',
-        'quantity_used',
-        'stock_before',
-        'stock_after',
+        'quantity',
+        'buyer_user_id',
     ];
-    
-    public function user()
+
+    public function sellerUser()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function buyerUser()
     {
         return $this->belongsTo(User::class);
     }

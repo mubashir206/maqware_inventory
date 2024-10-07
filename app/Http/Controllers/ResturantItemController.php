@@ -11,12 +11,28 @@ use Illuminate\Support\Facades\Mail;
 
 class ResturantItemController extends Controller
 {
-    function index($id)
+    public function index(Request $request, $id)
     {
-        $items = Item::where('restaurant_id', '=', $id)->get();
+        $query = $request->input('query');
+    
+        // Search for items based on the query and restaurant_id
+        $items = Item::where('restaurant_id', '=', $id)
+            ->where('name', 'LIKE', "%{$query}%")
+            ->latest()
+            ->paginate(4);
+    
+        // Handle AJAX requests
+        if ($request->ajax()) {
+            return response()->json([
+                'table_data' => view('layouts.pages.restaurantitem.table', compact('items'))->render(),
+                'pagination' => (string) $items->appends(['query' => $query])->links(),
+            ]);
+        }
+    
         $data = compact('id', 'items');
         return view('layouts.pages.restaurantitem.index')->with($data);
     }
+    
 
     function addPage($id)
     {

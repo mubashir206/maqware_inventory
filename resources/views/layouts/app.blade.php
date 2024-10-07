@@ -8,10 +8,11 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMAREgZ3YcvFbj12LnoNq5Hik/JWv4V1SA8yLgV" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
 
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -51,6 +52,9 @@
                                 </li>
                             @endif
                         @else
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('itemUsage') }}">{{ __('items Usage History') }}</a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('item.reduce') }}">{{ __('Usage History') }}</a>
                         </li>

@@ -9,13 +9,39 @@ use Illuminate\Http\Request;
 
 class RestaurantuserController extends Controller
 {
-    function index($id)
+    public function index(Request $request, $id)
     {
-        // dd($filterRest);
-        $restUser = RestaurantUser::where('restaurant_id', '=', $id)->get();
-        $data = compact('restUser', 'id');
-        return view('layouts.pages.restaurantuser.index')->with($data);
+        $query = $request->input('query');
+        $selectedRestaurant = $request->input('restaurant'); 
+    
+        $restaurants = Restaurant::all(); 
+    
+        $restUser = RestaurantUser::where('restaurant_id', '=', $id)
+            ->when($selectedRestaurant, function ($q) use ($selectedRestaurant) {
+                $q->where('restaurant_id', $selectedRestaurant); 
+            })
+            ->when($query, function ($q) use ($query) {
+                $q->whereHas('user', function ($q) use ($query) {
+                    $q->where('name', 'LIKE', "%{$query}%");
+                })
+                ->orWhereHas('restaurant', function ($q) use ($query) {
+                    $q->where('name', 'LIKE', "%{$query}%");
+                });
+            })
+            ->latest()
+            ->paginate(4);
+    
+        if ($request->ajax()) {
+            return response()->json([
+                'table_data' => view('layouts.pages.restaurantuser.table', compact('restUser'))->render(),
+                'pagination' => (string) $restUser->appends(['query' => $query, 'restaurant' => $selectedRestaurant])->links(),
+            ]);
+        }
+    
+        return view('layouts.pages.restaurantuser.index', compact('restUser', 'id', 'restaurants', 'selectedRestaurant'));
     }
+    
+    
 
     function addPage($id)
     {

@@ -12,12 +12,35 @@ use Illuminate\Support\Facades\Auth;
 
 class ItemController extends Controller
 {
-    function index()
+    public function index(Request $request)
     {
-        $items = Item::all();
-        $data = compact('items');
-        return view('layouts.pages.items.index')->with($data);
+        $query = $request->input('query');  // Get search input
+        $restaurantFilter = $request->input('restaurant_id');  // Get selected restaurant filter
+    
+        $items = Item::query();
+    
+        if ($query) {
+            $items->where('name', 'LIKE', "%{$query}%")
+                  ->orWhere('description', 'LIKE', "%{$query}%");
+        }
+    
+        if ($restaurantFilter) {
+            $items->where('restaurant_id', $restaurantFilter);  // Filter by selected restaurant
+        }
+    
+        $items = $items->latest()->paginate(6);
+        $restaurants = Restaurant::all();  // Get all restaurants for the dropdown
+    
+        if ($request->ajax()) {
+            return response()->json([
+                'card_data' => view('layouts.pages.items.items-card', compact('items'))->render(),
+                'pagination' => (string) $items->appends(['query' => $query, 'restaurant_id' => $restaurantFilter])->links(),
+            ]);
+        }
+    
+        return view('layouts.pages.items.index', compact('items', 'restaurants'));
     }
+    
 
     function addPage()
     {
@@ -111,21 +134,21 @@ class ItemController extends Controller
 
         try {
             $item = Item::find($id);
-        
+
             $stockBefore = $item->quantity;
             $newQuantity = $request->quantity;
             $quantityUsed = $stockBefore - $newQuantity;
-    
-        
+
+
             // Update item details
             $item->name = $request->name;
             $item->description = $request->description;
-            $item->quantity = $newQuantity; 
+            $item->quantity = $newQuantity;
             $item->item_type_id = $request->item_type_id;
             $item->restaurant_id = $request->restaurant_id;
             $item->user_id = Auth::id();
             $item->save();
-        
+
             // Store item history
             $itemHistory = new ItemHistory();
             $itemHistory->name = $request->name;
@@ -139,11 +162,11 @@ class ItemController extends Controller
             if ($quantityUsed > $stockBefore) {
                 return back()->with('error', 'Not enough stock available to reduce.');
             }
-            
+
             if ($quantityUsed > 0 &&  $stockBefore >= $newQuantity) {
-                
+
                 $stockAfter = $newQuantity;
-        
+
                 // Store usage history
                 $usageHistory = new UsageHistory();
                 $usageHistory->user_id = Auth::id();
@@ -154,21 +177,17 @@ class ItemController extends Controller
                 $usageHistory->stock_after = $stockAfter;
                 $usageHistory->save();
             }
-        
+
             return redirect()->back()->with('success', 'The information has been updated successfully!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'error found');
         }
     }
 
-    function history()
-    {
-        $itemshistory = ItemHistory::all();
-        $data = compact('itemshistory');
-        return view('layouts.pages.items.history')->with($data);
-    }
 
-    function delete($id){
+
+    function delete($id)
+    {
         // dd($id);
         $item = Item::find($id);
 
@@ -179,4 +198,37 @@ class ItemController extends Controller
         $item->delete();
         return redirect()->back();
     }
+
+    public function history(Request $request)
+    {
+        $query = $request->input('query');
+        $restaurantFilter = $request->input('restaurant'); // Get the selected restaurant
+    
+        $restaurants = Restaurant::all(); // Fetch all restaurants for the dropdown
+    
+        $itemshistory = ItemHistory::with(['restaurant', 'itemType', 'user'])
+            ->when($restaurantFilter, function($q) use ($restaurantFilter) {
+                $q->whereHas('restaurant', function($q) use ($restaurantFilter) {
+                    $q->where('id', $restaurantFilter); // Filter by selected restaurant
+                });
+            })
+            ->when($query, function($q) use ($query) {
+                $q->where('name', 'LIKE', "%{$query}%"); // Search by item name
+            })
+            ->latest()
+            ->paginate(5);
+    
+        if ($request->ajax()) {
+            return response()->json([
+                'table_data' => view('layouts.pages.items.historysearch', compact('itemshistory'))->render(),
+            ]);
+        }
+    
+        return view('layouts.pages.items.history', compact('itemshistory', 'restaurants', 'restaurantFilter'));
+    }
+    
+    
+    
+    
+
 }

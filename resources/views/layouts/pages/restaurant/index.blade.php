@@ -1,56 +1,61 @@
 @extends('layouts.app')
+
 @section('content')
 <div class="container mt-5">
     <h2 class="mb-4">Restaurant Information</h2>
-    <div class="d-flex justify-content-end mb-2">
-        <div>
-            @if(Session::has('error'))
-                <div class="text-danger" role="alert">
-                    {{ Session::get('error') }}
-                </div>
-            @endif
-            @if(Session::has('success'))
-                <div class="text-success" role="alert">
-                    {{ Session::get('success') }}
-                </div>
-            @endif
-        </div>
-        <a href="{{ route('restaurant.add') }}" class="btn btn-primary">Add Restaurant</a>
 
-    </div>
-    <table class="table table-bordered table-hover">
-        <thead class="thead-dark">
-            <tr>
-                <th>#</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Address</th>
-                <th>Phone</th>
-                <th>Actions</th> 
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($restaurants as $key => $restaurant)
-            <tr>
-                <td>{{ $key + 1 }}</td>
-                <td>{{ $restaurant->name }}</td>
-                <td>{{ $restaurant->email }}</td>
-                <td>{{ $restaurant->address }}</td>
-                <td>{{ $restaurant->phone }}</td>
-                <td>
-                    <a href="{{ route('restaurant.delete', $restaurant->id) }}" onclick="return confirm('Are you want to delete this information')" title="Delete" class="btn btn-sm btn-danger">Delete</a>
-                    <a href="{{ route('restaurant.user', $restaurant->id) }}" title="Users" class="btn btn-sm btn-info">Users</a>
-                    <a href="{{ route('restaurant.item', $restaurant->id) }}" title="Items" class="btn btn-sm btn-secondary">Items</a>
-
-
-                </td>
-            </tr>
+   <!-- Restaurant Dropdown Filter -->
+        <select id="restaurantFilter" class="form-select mb-3" style="width: 300px;" onchange="fetchRestaurants()">
+            <option value="">Select Restaurant</option>
+            @foreach($allRestaurants as $restaurant)
+                <option value="{{ $restaurant->id }}">{{ $restaurant->name }}</option>
             @endforeach
-            
-        </tbody>
-        <div class="pagination">
-            {{ $restaurants->links() }}
-        </div>
-    </table>
+        </select>
+
+    <div class="d-flex justify-content-end mb-2">
+        <input type="text" id="myInput" class="form-control mb-3" placeholder="Search restaurants..." style="width: 300px;" onkeyup="fetchRestaurants()"> &nbsp;&nbsp;
+
+
+        <a href="{{ route('restaurant.add') }}" class="btn btn-primary ml-2">Add Restaurant</a>
+    </div>
+
+    <!-- Restaurants Table -->
+    <div id="restaurants-table">
+        @include('layouts.pages.restaurant.restaurant-table', ['restaurants' => $restaurants])
+    </div>
+
+    <div id="pagination-links">
+        {{ $restaurants->links() }}
+    </div>
 </div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- AJAX for Search, Filter, and Pagination -->
+<script>
+    function fetchRestaurants(page = 1) {
+        var query = document.getElementById('myInput').value;
+        var restaurantFilter = document.getElementById('restaurantFilter').value;  // Get selected restaurant filter
+
+        $.ajax({
+            url: "{{ route('restaurant.search') }}?page=" + page + "&query=" + query + "&restaurant_id=" + restaurantFilter,
+            method: 'GET',
+            success: function(data) {
+                $('#restaurants-table').html(data.table_data);
+                $('#pagination-links').html(data.pagination);
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error: ", error);
+            }
+        });
+    }
+
+    // Handle pagination click with AJAX
+    $(document).on('click', '.pagination a', function(event) {
+        event.preventDefault();
+        var page = $(this).attr('href').split('page=')[1];
+        fetchRestaurants(page);
+    });
+</script>
 @endsection
